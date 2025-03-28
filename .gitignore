@@ -1,0 +1,44 @@
+# Ignore Python cache and environment files
+__pycache__/
+*.py[cod]
+*.so
+
+# Ignore virtual environment
+venv/
+.env
+
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore jupyter notebook
+*.ipynb
+
+# Ignore logs
+logs/
+*.log
+
+# Ignore data folder
+data/
+
+# Ignore Docker-related files
+Dockerfile
+.dockerignore
+docker-compose.yml
+*.dockerfile
+
+# Ignore model checkpoints and large files
+checkpoints/
+*.h5
+*.ckpt
+*.pth
+*.pt
+
+# Ignore output files
+output/
+*.csv
+*.tsv
+*.json
+
+# Ignore system files
+.DS_Store
+Thumbs.db

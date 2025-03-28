@@ -1,0 +1,27 @@
+payload : {
+    "username" : "sbhattarai001",
+    "password": "Bhadrapur@8"
+}
+
+login_url : "https://auth.ceda.ac.uk/account/signin/?r=http%3A%2F%2Fservices.ceda.ac.uk%2Fcedasite%2Fmyceda%2Fuser%2F"
+weather_data_base_url : "https://dap.ceda.ac.uk/badc/ukmo-midas-open/data/uk-hourly-weather-obs/dataset-version-201901/greater-london/00723_kew-gardens/qc-version-1/midas-open_uk-hourly-weather-obs_dv-201901_greater-london_00723_kew-gardens_qcv-1_{year}.csv?download=1"
+rain_data_base_url : ""
+
+year_range : [2011,2017]
+
+headers : {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+        'Referer': login_url
+    }
+
+weather_parameters : ["ob_time", "wind_direction", "wind_speed", "air_temperature", "dewpoint", "rltv_hum"]
+rain_parameters : ["ob_end_time", "prcp_amt"]
+
+weather_data_save_path : "./data/weather_data"
+rain_data_save_path : "./data/rain_data"
+processed_data_save_path : "./data/processed_data"
+processed_rain_data_filename : "processed_rain_data.csv"
+processed_weather_data_filename : "processed_weather_data.csv"
+
+weather_data_skiprows : 280
+rain_data_skiprows: 61
