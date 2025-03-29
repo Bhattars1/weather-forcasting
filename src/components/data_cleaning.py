@@ -11,6 +11,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")
 
 from src.logger import logging
 from src.exception_handler import CustomException
+
 with open("./src/components/config.yaml", "r") as file:
     args = yaml.safe_load(file)
 
@@ -250,13 +251,38 @@ class Cleaner:
                                                                                    format="%Y-%m-%d %H:%M:%S")
             logging.info(f"Processed weather data imported successfully")
 
-            merged_df = processed_weather_data.merge(processed_rain_data[self.args["rain_parameters"]],
-                                                     left_on=self.args["weather_parameters"][0],
-                                                     right_on=self.args["rain_parameters"][0],
-                                                     how="left")
+
+            # Find common date range
+            start_date = max(processed_weather_data[self.args["weather_parameters"][0]].min(), 
+                            processed_rain_data[self.args["rain_parameters"][0]].min())
             
+            end_date = min(processed_weather_data[self.args["weather_parameters"][0]].max(),
+                           processed_rain_data[self.args["rain_parameters"][0]].max())
+
+            # Filter both datasets to keep only the common range
+            filtered_weather_data = processed_weather_data[
+                (processed_weather_data[self.args["weather_parameters"][0]] >= start_date) &
+                (processed_weather_data[self.args["weather_parameters"][0]] <= end_date)
+            ]
+
+            filtered_rain_data = processed_rain_data[
+                (processed_rain_data[self.args["rain_parameters"][0]] >= start_date) &
+                (processed_rain_data[self.args["rain_parameters"][0]] <= end_date)
+            ]
+
+            merged_df = filtered_weather_data.merge(
+                                                    filtered_rain_data[self.args["rain_parameters"]],
+                                                    left_on=self.args["weather_parameters"][0],
+                                                    right_on=self.args["rain_parameters"][0],
+                                                    how="left"
+                                                    )
+            logging.info(f"The length of merged data will be: {len(merged_df)}")
 
             merged_df.drop(columns=[self.args["rain_parameters"][0]], inplace=True)
+            logging.info("Datasets Successfully merged")
+            merged_df.to_csv("merged_data.csv", index=False)
+            
+            logging.info(f"The merged dataset date spans between {min(merged_df[args["weather_parameters"][0]])} and {max(merged_df[args["weather_parameters"][0]])}")
             return merged_df
         
 
@@ -265,7 +291,7 @@ class Cleaner:
     
 
 
-def pipeline():
+def cleaning_pipeline():
 
     weather_data_cleaner = Cleaner(
         data_folder_path=args["weather_data_save_path"],
@@ -289,9 +315,5 @@ def pipeline():
     rain_data = rain_data_cleaner.initiate_import()
     rain_data = rain_data_cleaner.fill_missing_values(df=rain_data)
     rain_data_cleaner.is_perfect_timeseries_and_fill(df=rain_data)
-    rain_data = rain_data_cleaner.merge()
-
-        
-
-
-
+    merged_data = rain_data_cleaner.merge()
+    return merged_data

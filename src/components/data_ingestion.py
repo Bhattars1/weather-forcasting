@@ -80,14 +80,14 @@ class DataIngestion:
         logging.info("Data Downloades successfully!!!")
 
 
-if __name__ =="__main__":
-    with open("./src/components/config.yaml", "r") as file:
-        args = yaml.safe_load(file)
+# if __name__ =="__main__":
+#     with open("./src/components/config.yaml", "r") as file:
+#         args = yaml.safe_load(file)
 
-    obj = DataIngestion(save_path=["weather_data_save_path"],
-                        payload=args["payload"],
-                        data_base_url=args["weather_data_base_url"],
-                        login_url=args["login_url"],
-                        year_range=args["year_range"],
-                        headers=args["headers"])
-    obj.initiate_scrapping()
+#     obj = DataIngestion(save_path=["weather_data_save_path"],
+#                         payload=args["payload"],
+#                         data_base_url=args["weather_data_base_url"],
+#                         login_url=args["login_url"],
+#                         year_range=args["year_range"],
+#                         headers=args["headers"])
+#     obj.initiate_scrapping()
