@@ -4,7 +4,6 @@ import sys
 from bs4 import BeautifulSoup
 import requests
 from pathlib import Path
-import yaml
 
 # Get the project root (weather-forcasting) and add it to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
@@ -80,14 +79,6 @@ class DataIngestion:
         logging.info("Data Downloades successfully!!!")
 
 
-# if __name__ =="__main__":
-#     with open("./src/components/config.yaml", "r") as file:
-#         args = yaml.safe_load(file)
-
-#     obj = DataIngestion(save_path=["weather_data_save_path"],
-#                         payload=args["payload"],
-#                         data_base_url=args["weather_data_base_url"],
-#                         login_url=args["login_url"],
-#                         year_range=args["year_range"],
-#                         headers=args["headers"])
-#     obj.initiate_scrapping()
+def ingestion_pipeline():
+    obj = DataIngestion()
+    obj.initiate_scrapping()
