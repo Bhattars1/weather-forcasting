@@ -17,7 +17,8 @@ venv/
 logs/
 *.log
 
-# Ignore data folder
+# Ignore data and model folder
+models/
 data/
 
 # Ignore Docker-related files
