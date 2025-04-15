@@ -5,10 +5,6 @@ from pathlib import Path
 import pandas as pd
 import yaml
 
-
-# Get the project root (weather-forcasting) and add it to sys.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
-
 from src.logger import logging
 from src.exception_handler import CustomException
 
@@ -17,7 +13,8 @@ with open("./src/components/config.yaml", "r") as file:
 
 
 class Cleaner:
-    def __init__(self, data_folder_path, processed_data_path, skip_rows, args = args, weather_parameters=None, prcp_colm=None):
+    def __init__(self,parameter_, data_folder_path, processed_data_path, skip_rows, args = args, weather_parameters=None, prcp_colm=None):
+        self.parameter_ = parameter_
         self.args = args
         self.data_folder_path = data_folder_path
         self.processed_data_path = processed_data_path
@@ -27,7 +24,7 @@ class Cleaner:
         self.prcp_colm = prcp_colm
 
     def initiate_import(self):
-        logging.info("Raw dataset import for cleaning is initiated...")
+        logging.info(f"Raw {self.parameter_} dataset import for cleaning is initiated...")
 
         try:
             df_list = []
@@ -294,6 +291,7 @@ class Cleaner:
 def cleaning_pipeline():
 
     weather_data_cleaner = Cleaner(
+        parameter_="Weather",
         data_folder_path=args["weather_data_save_path"],
         processed_data_path=args["processed_data_save_path"],
         weather_parameters=args["weather_parameters"],
@@ -305,6 +303,7 @@ def cleaning_pipeline():
 
 
     rain_data_cleaner = Cleaner(
+        parameter_="Rain",
         data_folder_path=args["rain_data_save_path"],
         processed_data_path=args["processed_data_save_path"],
         skip_rows=args["rain_data_skiprows"],

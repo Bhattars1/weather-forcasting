@@ -1,28 +1,40 @@
-import os
+import yaml
 import sys
 
 from bs4 import BeautifulSoup
 import requests
 from pathlib import Path
 
-# Get the project root (weather-forcasting) and add it to sys.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
+# Load config
+with open("./src/components/config.yaml", "r") as file:
+    args = yaml.safe_load(file)
 
 from src.logger import logging
 from src.exception_handler import CustomException
 
+weather_data_save_path = args["weather_data_save_path"]
+rain_data_save_path = args["rain_data_save_path"]
+weather_data_base_url = args["weather_data_base_url"]
+rain_dat_base_url = args["rain_data_base_url"]
 
+# Default arguments
+payload = args["payload"]
+login_url = args["login_url"]
+year_range = args["year_range"]
+headers = args["headers"]
 class DataIngestion:
 
     def __init__(self,
-                 save_path,
-                 payload,
                  data_base_url,
-                 login_url,
-                 year_range,
-                 headers,
+                 save_path,
+                 parameter_,
+                 payload=payload,
+                 login_url=login_url,
+                 year_range=year_range,
+                 headers=headers,
                  ):
         self.payload = payload
+        self.parameter_ = parameter_
         self.data_base_url = data_base_url
         self.login_url = login_url
         self.year_range = year_range
@@ -30,7 +42,7 @@ class DataIngestion:
         self.save_path = save_path
 
     def initiate_scrapping(self):
-        logging.info("Data ingestion initiated")
+        logging.info(f"{self.parameter_} Data ingestion initiated")
         try:
             session = requests.Session()
             response = session.get(self.login_url)
@@ -75,10 +87,17 @@ class DataIngestion:
                     
         except Exception as e:
             raise CustomException(e, sys)
-        print("Data Downloades successfully!!!")
         logging.info("Data Downloades successfully!!!")
 
 
-def ingestion_pipeline():
-    obj = DataIngestion()
+def weather_data_ingestion_pipeline():
+    obj = DataIngestion(data_base_url= weather_data_base_url,
+                        save_path= weather_data_save_path,
+                        parameter_="Weather")
+    obj.initiate_scrapping()
+
+def rain_data_ingestion_pipeline():
+    obj = DataIngestion(data_base_url=rain_dat_base_url,
+                        save_path=rain_data_save_path,
+                        parameter_="Rain")
     obj.initiate_scrapping()

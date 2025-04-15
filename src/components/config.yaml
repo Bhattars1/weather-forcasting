@@ -5,9 +5,9 @@ payload : {
 
 login_url : "https://auth.ceda.ac.uk/account/signin/?r=http%3A%2F%2Fservices.ceda.ac.uk%2Fcedasite%2Fmyceda%2Fuser%2F"
 weather_data_base_url : "https://dap.ceda.ac.uk/badc/ukmo-midas-open/data/uk-hourly-weather-obs/dataset-version-201901/greater-london/00723_kew-gardens/qc-version-1/midas-open_uk-hourly-weather-obs_dv-201901_greater-london_00723_kew-gardens_qcv-1_{year}.csv?download=1"
-rain_data_base_url : ""
+rain_data_base_url : "https://dap.ceda.ac.uk/badc/ukmo-midas-open/data/uk-hourly-rain-obs/dataset-version-202107/greater-london/00723_kew-gardens/qc-version-1/midas-open_uk-hourly-rain-obs_dv-202107_greater-london_00723_kew-gardens_qcv-1_{year}.csv?download=1"
 
-year_range : [2011,2017]
+year_range : [2008,2017]
 
 headers : {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
@@ -40,5 +40,5 @@ processed_weather_data_filename : "processed_weather_data.csv"
 weather_data_skiprows : 280
 rain_data_skiprows: 61
 
-test_size : 0.15
+test_size : 0.20
 
