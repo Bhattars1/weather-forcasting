@@ -13,10 +13,6 @@ import xgboost as xgb
 from sklearn.ensemble import RandomForestRegressor
 import joblib
 
-<<<<<<< HEAD
-=======
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
->>>>>>> 9ff0f217d1506ba03c8bcde04cf999b341f66e30
 
 from src.logger import logging
 from src.exception_handler import CustomException
@@ -27,12 +23,6 @@ from src.components.algorithms import WindSpeedPredictionLSTM, HumidityMLP
 with open("./src/components/config.yaml", "r") as file:
     args = yaml.safe_load(file)
 
-<<<<<<< HEAD
-=======
-
-# preprocessing = Preprocessing()
-# X, Y = preprocessing.sliding_window_dataset()
->>>>>>> 9ff0f217d1506ba03c8bcde04cf999b341f66e30
 with open('./data/preprocessed_data/data.pkl', 'rb') as f:
     X = pickle.load(f)
 with open('./data/preprocessed_data/labels.pkl', 'rb') as f:
@@ -53,26 +43,15 @@ class WeatherForcastingTraining:
         print("Training precipation model")
         logging.info("Training of  precipation forcasting model initiated")
         try:
-<<<<<<< HEAD
             precp_features = self.features[:,:,4:].numpy().reshape(self.features[:,:,4:].shape[0], -1)
             precp_test_features = self.test_features[:,:,4:].numpy().reshape(self.test_features[:,:,4:].shape[0], -1)
             randonforest_regressor = RandomForestRegressor(n_estimators=150)
             randonforest_regressor.fit(precp_features, self.targets[:,:,4].squeeze().numpy())
-=======
-            self.features = self.features[:,:,4:].numpy().reshape(self.features[:,:,4:].shape[0], -1)
-            self.test_features = self.test_features[:,:,4:].numpy().reshape(self.test_features[:,:,4:].shape[0], -1)
-            randonforest_regressor = RandomForestRegressor(n_estimators=150)
-            randonforest_regressor.fit( self.features, self.targets[:,:,4].squeeze().numpy())
->>>>>>> 9ff0f217d1506ba03c8bcde04cf999b341f66e30
 
             joblib.dump(randonforest_regressor, f"{args['models_save_path']}/precipitation_model.pkl")
             logging.info("Training of precipation model successful... Starting Evaluation")
 
-<<<<<<< HEAD
             preds = randonforest_regressor.predict(precp_test_features)
-=======
-            preds = randonforest_regressor.predict(self.test_features)
->>>>>>> 9ff0f217d1506ba03c8bcde04cf999b341f66e30
             
             mse = mean_squared_error(self.test_targets[:,:,4].squeeze().numpy(), preds)
             mae = mean_absolute_error(self.test_targets[:,:,4].squeeze().numpy(), preds)
@@ -132,10 +111,7 @@ class WeatherForcastingTraining:
             windspeed_model = WindSpeedPredictionLSTM(input_dim=input_dim,
                                                     hidden_dim=hidden_dim,
                                                     output_dim=output_dim,
-<<<<<<< HEAD
                                                     num_layers=2,
-=======
->>>>>>> 9ff0f217d1506ba03c8bcde04cf999b341f66e30
                                                     dropout=0.2)
 
             train_dataset = TensorDataset(self.features, self.targets[:,:,1])
@@ -154,10 +130,7 @@ class WeatherForcastingTraining:
             epochs = 12
             logging.info("Wind speed Model training started.....")
             for epoch in range(epochs):
-<<<<<<< HEAD
                 print(f"Epoch {epoch+1} of {epochs}")
-=======
->>>>>>> 9ff0f217d1506ba03c8bcde04cf999b341f66e30
                 windspeed_model.train()
                 train_loss = 0.0
 
@@ -172,11 +145,7 @@ class WeatherForcastingTraining:
                 avg_train_loss = train_loss / len(train_loader.dataset)
 
                 logging.info(f"The train loss in epoch {epoch+1} is :{avg_train_loss}")
-<<<<<<< HEAD
             logging.info("Training Successful! Starting Evaluation....")
-=======
-            logging.info("Training Successful! Starting EValuation....")
->>>>>>> 9ff0f217d1506ba03c8bcde04cf999b341f66e30
             torch.save(windspeed_model.state_dict(), f"{args['models_save_path']}/windspeed.pth")
             windspeed_model.eval()
             test_loss = 0.0
@@ -195,19 +164,10 @@ class WeatherForcastingTraining:
         print("Train humidity model")
         logging.info("Training of humidity forecasting model initiated")
         try:
-<<<<<<< HEAD
             humidity_features = self.features[:,:,3].unsqueeze(2)
             hunidity_test_features = self.test_features[:,:,3].unsqueeze(2)
             
             input_dim = humidity_features.shape[1]
-=======
-            self.features = self.features[:,:,3].unsqueeze(2)
-            self.targets = self.targets[:,:,3]
-            self.test_features = self.test_features[:,:,3].unsqueeze(2)
-            self.test_targets = self.test_targets[:,:,3]
-            
-            input_dim = self.features.shape[1]
->>>>>>> 9ff0f217d1506ba03c8bcde04cf999b341f66e30
             hidden_dim = 128
             output_dim = 1
             dropout = 0.2
@@ -220,13 +180,8 @@ class WeatherForcastingTraining:
 
             )
 
-<<<<<<< HEAD
             train_dataset = TensorDataset(humidity_features, self.targets[:,:,3])
             test_dataset = TensorDataset(hunidity_test_features, self.test_targets[:,:,3])
-=======
-            train_dataset = TensorDataset(self.features, self.targets)
-            test_dataset = TensorDataset(self.test_features, self.test_targets)
->>>>>>> 9ff0f217d1506ba03c8bcde04cf999b341f66e30
 
             train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
             test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
@@ -282,11 +237,7 @@ class WeatherForcastingTraining:
 
             logging.info(f"Test MSE: {avg_test_loss:.4f}")
             logging.info(f"Test MAE: {mae:.4f}")
-<<<<<<< HEAD
             logging.info(f"Test R squared Score: {r2:.4f}")
-=======
-            logging.info(f"Test R² Score: {r2:.4f}")
->>>>>>> 9ff0f217d1506ba03c8bcde04cf999b341f66e30
 
         except Exception as e:
             raise CustomException(e, sys)
