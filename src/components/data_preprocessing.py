@@ -5,6 +5,12 @@ import pandas as pd
 import numpy as np
 import pickle
 from sklearn.preprocessing import MinMaxScaler
+<<<<<<< HEAD
+=======
+
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
+>>>>>>> 9ff0f217d1506ba03c8bcde04cf999b341f66e30
 
 from src.logger import logging
 from src.exception_handler import CustomException
@@ -101,7 +107,12 @@ class Preprocessing:
                 pickle.dump(X, f)
             with open('./data/preprocessed_data/labels.pkl', 'wb') as f:
                 pickle.dump(Y, f)
+<<<<<<< HEAD
             logging.info("The preprocessed data and labels are saved successfully in the directory")
+=======
+
+            # return X, Y
+>>>>>>> 9ff0f217d1506ba03c8bcde04cf999b341f66e30
         
         except Exception as e:
             raise CustomException(e,sys)

@@ -90,6 +90,7 @@ class DataIngestion:
         logging.info("Data Downloades successfully!!!")
 
 
+<<<<<<< HEAD
 def weather_data_ingestion_pipeline():
     obj = DataIngestion(data_base_url= weather_data_base_url,
                         save_path= weather_data_save_path,
@@ -100,4 +101,8 @@ def rain_data_ingestion_pipeline():
     obj = DataIngestion(data_base_url=rain_dat_base_url,
                         save_path=rain_data_save_path,
                         parameter_="Rain")
+=======
+def ingestion_pipeline():
+    obj = DataIngestion()
+>>>>>>> 9ff0f217d1506ba03c8bcde04cf999b341f66e30
     obj.initiate_scrapping()
