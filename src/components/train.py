@@ -1,5 +1,4 @@
 import sys
-import os
 import pickle
 import yaml
 
@@ -48,7 +47,7 @@ class WeatherForcastingTraining:
             randonforest_regressor = RandomForestRegressor(n_estimators=150)
             randonforest_regressor.fit(precp_features, self.targets[:,:,4].squeeze().numpy())
 
-            joblib.dump(randonforest_regressor, f"{args['models_save_path']}/precipitation_model.pkl")
+            joblib.dump(randonforest_regressor, f"{args['models_save_path']}/{args['precipitation_model_filename']}")
             logging.info("Training of precipation model successful... Starting Evaluation")
 
             preds = randonforest_regressor.predict(precp_test_features)
@@ -80,7 +79,7 @@ class WeatherForcastingTraining:
             }
     
             xgb_model = xgb.train(params, dtrain, num_boost_round = 125, callbacks=[xgb.callback.LearningRateScheduler(lambda epoch: 0.1 * (0.99 ** epoch))])
-            xgb_model.save_model(f"{args['models_save_path']}/temperature_model.json")
+            xgb_model.save_model(f"{args['models_save_path']}/{args['temperature_model_filename']}")
             logging.info(f"Temperature model saved Successfully")
             logging.info("Training of temperature forcasting model successful !!! Starting Evaluation..")
 
@@ -146,7 +145,7 @@ class WeatherForcastingTraining:
 
                 logging.info(f"The train loss in epoch {epoch+1} is :{avg_train_loss}")
             logging.info("Training Successful! Starting Evaluation....")
-            torch.save(windspeed_model.state_dict(), f"{args['models_save_path']}/windspeed.pth")
+            torch.save(windspeed_model.state_dict(), f"{args['models_save_path']}/{args['wind_speed_model_filename']}")
             windspeed_model.eval()
             test_loss = 0.0
             with torch.no_grad():
@@ -211,7 +210,7 @@ class WeatherForcastingTraining:
                 logging.info(f"Train loss at epoch {epoch+1}: {avg_train_loss:.4f}")
 
             logging.info("Training Successful! Starting Evaluation....")
-            torch.save(humidity_model.state_dict(), f"{args['models_save_path']}/windspeed.pth")
+            torch.save(humidity_model.state_dict(), f"{args['models_save_path']}/{args['humidity_model_filename']}")
 
             humidity_model.eval()
             test_loss = 0.0

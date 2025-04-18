@@ -5,6 +5,9 @@ import pandas as pd
 import numpy as np
 import pickle
 from sklearn.preprocessing import MinMaxScaler
+import joblib
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 from src.logger import logging
 from src.exception_handler import CustomException
@@ -33,12 +36,10 @@ class Preprocessing:
 
             # Fourier Transform Encoding for Hour (24-hour cycle)
             df["sine_hour"] = np.sin(2 * np.pi * df["hour"] / 24)
-            # df["cosine_hour"] = np.cos(2 * np.pi * df["hour"] / 24)
             logging.info("Successfully performed Fourier transform of hour of the day")
 
             # Fourier Transform Encoding for Month (12-month cycle)
             df["sine_month"] = np.sin(2 * np.pi * df["month"] / 12)
-            # df["cosine_month"] = np.cos(2 * np.pi * df["month"] / 12)
             logging.info("Successfully performed Fourier transform of month of the year")
 
 
@@ -86,6 +87,7 @@ class Preprocessing:
             
             X_reshaped = X.reshape(-1, X.shape[2])
             X_scaled = self.scaler.fit_transform(X=X_reshaped)
+            joblib.dump(self.scaler, self.args["scalar_path"])
 
             # Reshape back to the original shape
             X = X_scaled.reshape(X.shape)
@@ -111,3 +113,4 @@ def preprocessing_pipeline():
     obj = Preprocessing()
     obj.sliding_window_dataset()
     
+preprocessing_pipeline()

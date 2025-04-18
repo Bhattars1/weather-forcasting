@@ -18,17 +18,22 @@ weather_parameters : ["ob_time", "wind_direction", "wind_speed", "air_temperatur
 rain_parameters : ["ob_end_time", "prcp_amt"]
 
 
-# features : ["wind_dir_sin", "wind_speed", "air_temperature", "dewpoint", "rltv_hum", "prcp_amt", "sine_hour", "cosine_hour", "sine_month", "cosine_month"]
 features : ["wind_dir_sin", "wind_speed", "air_temperature", "rltv_hum", "prcp_amt", "sine_hour", "sine_month"]
-
-# targets : ["wind_direction", "wind_speed", "air_temperature", "dewpoint", "rltv_hum", "prcp_amt"]
 targets : ["wind_direction", "wind_speed", "air_temperature", "rltv_hum", "prcp_amt"]
-# targets : ["air_temperature"]
 
 weather_data_save_path : "./data/weather_data"
 rain_data_save_path : "./data/rain_data"
 processed_data_save_path : "./data/processed_data"
 models_save_path : "./models"
+scalar_path : "./scalars/scaler.pkl"
+
+
+humidity_model_filename : "humidity.pth"
+precipitation_model_filename : "precipitation_model.pkl"
+temperature_model_filename : "temperature_model.json"
+wind_speed_model_filename : "windspeed.pth"
+
+
 
 preprocessed_dir : "./data/preprocessed_data"
 preprocessed_data_path : "./data/preprocessed_data/data.pkl"
@@ -40,9 +45,5 @@ processed_weather_data_filename : "processed_weather_data.csv"
 weather_data_skiprows : 280
 rain_data_skiprows: 61
 
-<<<<<<< HEAD
 test_size : 0.20
-=======
-test_size : 0.15
->>>>>>> 9ff0f217d1506ba03c8bcde04cf999b341f66e30
 
