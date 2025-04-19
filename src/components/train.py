@@ -13,6 +13,10 @@ from sklearn.ensemble import RandomForestRegressor
 import joblib
 
 
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
+
+
 from src.logger import logging
 from src.exception_handler import CustomException
 from src.utils import split_data
@@ -244,8 +248,9 @@ class WeatherForcastingTraining:
 
 def training_pipeline():
     obj = WeatherForcastingTraining()
-    obj.train_precipitation_model()
+    # obj.train_precipitation_model()
     obj.train_temprature_model()
-    obj.train_windspeed_model()
-    obj.train_humidity_model()
+    # obj.train_windspeed_model()
+    # obj.train_humidity_model()
+training_pipeline()
         

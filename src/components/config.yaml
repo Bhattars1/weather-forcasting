@@ -1,3 +1,5 @@
+## Ingestion Configuration
+
 payload : {
     "username" : "sbhattarai001",
     "password": "Bhadrapur@8"
@@ -14,6 +16,8 @@ headers : {
         'Referer': login_url
     }
 
+## Parameter Configurations
+
 weather_parameters : ["ob_time", "wind_direction", "wind_speed", "air_temperature", "dewpoint", "rltv_hum"]
 rain_parameters : ["ob_end_time", "prcp_amt"]
 
@@ -21,12 +25,26 @@ rain_parameters : ["ob_end_time", "prcp_amt"]
 features : ["wind_dir_sin", "wind_speed", "air_temperature", "rltv_hum", "prcp_amt", "sine_hour", "sine_month"]
 targets : ["wind_direction", "wind_speed", "air_temperature", "rltv_hum", "prcp_amt"]
 
+
+## Paths Configuration
+
+# Data paths
 weather_data_save_path : "./data/weather_data"
 rain_data_save_path : "./data/rain_data"
-processed_data_save_path : "./data/processed_data"
-models_save_path : "./models"
-scalar_path : "./scalars/scaler.pkl"
 
+processed_data_save_path : "./data/processed_data"
+
+processed_rain_data_filename : "processed_rain_data.csv"
+processed_weather_data_filename : "processed_weather_data.csv"
+
+weather_data_skiprows : 280
+rain_data_skiprows: 61
+
+
+
+
+# Model paths
+models_save_path : "./models"
 
 humidity_model_filename : "humidity.pth"
 precipitation_model_filename : "precipitation_model.pkl"
@@ -35,15 +53,13 @@ wind_speed_model_filename : "windspeed.pth"
 
 
 
+
+# Preprocessing paths/args
 preprocessed_dir : "./data/preprocessed_data"
 preprocessed_data_path : "./data/preprocessed_data/data.pkl"
 preprocessed_label_path : "./data/preprocessed_data/label.pkl"
 
-processed_rain_data_filename : "processed_rain_data.csv"
-processed_weather_data_filename : "processed_weather_data.csv"
-
-weather_data_skiprows : 280
-rain_data_skiprows: 61
+scalar_path : "./scalars/scaler.pkl"
 
 test_size : 0.20
 
