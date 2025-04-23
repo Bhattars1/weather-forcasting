@@ -97,6 +97,7 @@ def weather_data_ingestion_pipeline():
     obj.initiate_scrapping()
 
 def rain_data_ingestion_pipeline():
+
     obj = DataIngestion(data_base_url=rain_dat_base_url,
                         save_path=rain_data_save_path,
                         parameter_="Rain")

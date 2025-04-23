@@ -18,12 +18,14 @@ headers : {
 
 ## Parameter Configurations
 
-weather_parameters : ["ob_time", "wind_direction", "wind_speed", "air_temperature", "dewpoint", "rltv_hum"]
+weather_parameters : ["ob_time", "wind_speed", "air_temperature", "rltv_hum"]
 rain_parameters : ["ob_end_time", "prcp_amt"]
 
 
-features : ["wind_dir_sin", "wind_speed", "air_temperature", "rltv_hum", "prcp_amt", "sine_hour", "sine_month"]
-targets : ["wind_direction", "wind_speed", "air_temperature", "rltv_hum", "prcp_amt"]
+features : ["wind_speed", "air_temperature", "rltv_hum", "prcp_amt", "sine_hour", "sine_month"]
+targets : ["wind_speed", "air_temperature", "rltv_hum", "prcp_amt"]
+
+forcasting_hours : 24
 
 
 ## Paths Configuration
@@ -36,6 +38,10 @@ processed_data_save_path : "./data/processed_data"
 
 processed_rain_data_filename : "processed_rain_data.csv"
 processed_weather_data_filename : "processed_weather_data.csv"
+
+forcasting_data_path : "data/forcasting_data/sample_data.csv"
+
+forcasted_data_path : "./data/forcasting_data/forcasted_data.csv"
 
 weather_data_skiprows : 280
 rain_data_skiprows: 61
@@ -50,6 +56,7 @@ humidity_model_filename : "humidity.pth"
 precipitation_model_filename : "precipitation_model.pkl"
 temperature_model_filename : "temperature_model.json"
 wind_speed_model_filename : "windspeed.pth"
+dewpoint_model_filename : "dewpoint_model.json"
 
 
 
@@ -59,7 +66,7 @@ preprocessed_dir : "./data/preprocessed_data"
 preprocessed_data_path : "./data/preprocessed_data/data.pkl"
 preprocessed_label_path : "./data/preprocessed_data/label.pkl"
 
-scalar_path : "./scalars/scaler.pkl"
+scalar_path : "./scaler/scaler.pkl"
 
 test_size : 0.20
 

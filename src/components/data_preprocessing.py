@@ -42,18 +42,9 @@ class Preprocessing:
             df["sine_month"] = np.sin(2 * np.pi * df["month"] / 12)
             logging.info("Successfully performed Fourier transform of month of the year")
 
-
-            try:
-                # Cyclic Encoding for Wind Direction
-                df["wind_dir_sin"] = np.sin(np.radians(df[args["weather_parameters"][1]]))
-                logging.info("successfully encoded the wind direction using sine function")
-
-                return df
-            except:
-                print("Could not transform wind direction to cyclic encoding, Continue to next step...")
-                pass
             # Drop original columns that are now encoded
             df.drop(columns=["ob_time", "hour", "month"], inplace=True)
+            return df
 
         except Exception as e:
             raise CustomException(e, sys) 

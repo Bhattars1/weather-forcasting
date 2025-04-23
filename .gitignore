@@ -20,6 +20,7 @@ logs/
 # Ignore data and model folder
 models/
 data/
+scaler/
 
 # Ignore Docker-related files
 Dockerfile

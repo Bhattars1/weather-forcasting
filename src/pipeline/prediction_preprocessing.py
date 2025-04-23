@@ -7,6 +7,8 @@ import numpy as np
 import joblib
 from datetime import timedelta
 
+from sklearn.preprocessing import MinMaxScaler
+
 
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
@@ -20,57 +22,60 @@ with open("./src/components/config.yaml", "r") as file:
 scaler = joblib.load(args["scalar_path"])
 
 
-data = pd.read_csv(r"src\pipeline\sample_data.csv")
-
 class PredictPreprocessing:
     def __init__(self,
-                 data : pd.DataFrame,
+                 data_path=args["forcasting_data_path"],
                  scaler=scaler,
-                 args = args
+                 args = args,
+                 data = None
                  ):
+        self.data_path = data_path
         self.data = data
         self.scaler = scaler
         self.args = args
 
     def transformations(self):
         try:
-            logging.info("Preprocessing for prediction initiated")
+            logging.info("Transformations of day and month initiated")
+            self.data = pd.read_csv(self.data_path)
+            datetime_col = self.data.columns[0]
+            self.data[datetime_col] = pd.to_datetime(self.data[datetime_col], errors='coerce', dayfirst=True)
 
             # Extract hour and month
             self.data["hour"] = self.data.iloc[:, 0].dt.hour
             self.data["month"] = self.data.iloc[:, 0].dt.month
+
 
             # Fourier Transform Encoding for Hour (24-hour cycle)
             self.data["sine_hour"] = np.sin(2 * np.pi * self.data["hour"] / 24)
 
             # Fourier Transform Encoding for Month (12-month cycle)
             self.data["sine_month"] = np.sin(2 * np.pi * self.data["month"] / 12)
+
+            self.data.to_csv("seed.csv", index=False)
+            
             logging.info("Successfully transformed hour and month for prediction")
-        except Exception as e:
-            raise CustomException(e, sys)
 
-        try:
-            # Cyclic Encoding for Wind Direction
-            self.data.iloc[:,1] = np.sin(np.radians(self.data.iloc[:,1]))
-            logging.info("successfully encoded the wind direction using sine function")
+            time_col = self.data["ob_time"]
+            self.data.drop(columns=["hour", "month", "ob_time"], inplace=True)
+            # Scale the data
 
-            # Drop original columns that are now encoded
-            self.data.drop(columns=["hour", "month"], inplace=True)
-            self.data.drop(self.data.columns[0], axis=1, inplace=True)
+            logging.info("Scaling the data")
             self.data = self.data.to_numpy()
-            self.data = self.scaler.transform(X=self.data[:, 1:])
-            logging.info("Scaled the data using MinMaxScaler for prediction")
-            logging.info("Preprocessing for prediction completed!!!")
-            try:
-                self.data.drop(columns=["ob_time"], inplace=True)
-            except:
-                pass
-            return self.data
+            # np.savetxt("seed.csv", self.data, delimiter=",")
 
+            self.data = self.scaler.transform(self.data)
+
+            self.data = pd.DataFrame(self.data)
+            self.data.insert(0, "ob_time", time_col)  
+
+            logging.info("Successfully scaled the data")
+
+            return self.data
         except Exception as e:
             raise CustomException(e, sys)
              
-    def prediction_data_consistency(self):
+    # def prediction_data_consistency(self):
         logging.info("Checking data consistency for prediction")
 
         try:
@@ -83,11 +88,12 @@ class PredictPreprocessing:
         except Exception as e:
             raise CustomException(e, sys)
         
-
+        
         try:
             float_cols = self.data.columns[1:]
-            self.data[float_cols] = self.data[float_cols].astype(np.float64)
-            datetime_col = self.data.columns[0]
+            for col in float_cols:
+                self.data[col] = pd.to_numeric(self.data[col], errors='coerce')
+            
             self.data[datetime_col] = pd.to_datetime(self.data[datetime_col], errors='coerce', dayfirst=True)
 
             # Columns consistency
@@ -96,8 +102,8 @@ class PredictPreprocessing:
             missing_cols = [col for col in expeced_columns if col not in self.data.columns]
             
             if "ob_time" in missing_cols:
-                logging.info(f"Date and time is missing. Forcasting is not possible!!!")
-                raise CustomException("Time and Date is missing. Forcasting is not possible!!!", sys)
+                logging.warning(f"Date and time is missing. Forcasting is not possible!!!")
+                raise Exception("Date and time is missing. Forcasting is not possible!!!")
             if len(missing_cols) > 0:
                 logging.info(f"Missing parameter/s: {missing_cols} found!! This may lead to less accurate forcast...")
 
@@ -128,7 +134,7 @@ class PredictPreprocessing:
                 years = combined_df[datetime_col].dt.year.dropna().unique()
                 years = sorted(years, reverse=True)  # Start from most recent year
 
-                found = False
+               
                 for y in years:
                     # Filter for that year and the date + time pattern
                     subset = combined_df[combined_df[datetime_col].dt.year == y]
@@ -155,8 +161,7 @@ class PredictPreprocessing:
 
                         # Now update self.data with the found data
                         self.data["prcp_amt"] = subset[rain_col].reset_index(drop=True)
-                        found = True
-                        break
+
                 logging.info("Successfully filled the precipation input data")
 
 
@@ -168,8 +173,6 @@ class PredictPreprocessing:
                 self.args["weather_parameters"].remove("prcp_amt")
                 
             # fill up other weather features if missing(excluding prcp_amt)
-
-            # Load the data only once
             data_search_path = self.args["weather_data_save_path"]
             df_list = []
 
@@ -180,7 +183,7 @@ class PredictPreprocessing:
                         file_path,
                         skiprows=self.args["weather_data_skiprows"],
                         na_values="NA",
-                        usecols=self.args["weather_parameters"][:-1] # Load all weather parameters
+                        usecols=self.args["weather_parameters"] # Load all weather parameters
                     )
                     df = df.drop(df.index[-1])  # Remove last row (summary/empty)
                     df_list.append(df)
@@ -197,12 +200,12 @@ class PredictPreprocessing:
 
                 # Step 2: Extract year range to fallback
                 years = combined_df[datetime_col].dt.year.dropna().unique()
-                years = sorted(years, reverse=True)  # Start from most recent year
-
+                years = sorted(years, reverse=True) 
+                
             for param in self.args["weather_parameters"]:  # Loop through all weather parameters
                 if param in missing_cols:
                     logging.info(f"Missing parameter: {param} found!")
-                    found = False
+                    
                     for y in years:
                         # Filter for that year and the date + time pattern
                         subset = combined_df[combined_df[datetime_col].dt.year == y]
@@ -229,28 +232,31 @@ class PredictPreprocessing:
 
                             # Now update self.data with the found data for this weather parameter
                             self.data[param] = subset[param].reset_index(drop=True)
-                            found = True
                             break 
                     logging.info(f"Successfully filled the {param} input data")
 
         except Exception as e:
             raise CustomException(e,sys)
 
-
+        logging.info("Data null value checking started")
         try:
+
             # Check if any of the data are missing
             if self.data.isnull().values.any():
-                logging.info("Starting missing weather & precipitation filling process.")
-                self.data.fillna(method='ffill', inplace=True)
+                logging.info("Null value found, Starting  process.")
+                self.data.ffill()
+            else:
+                logging.info("No null value found proceeding further...")
 
         except Exception as e:
             raise CustomException(e, sys)
     
         
 
-def prediction_preprocessing_pipeline(data):
+def prediction_preprocessing_pipeline():
 
-    obj = PredictPreprocessing(data)
-    obj.prediction_data_consistency()
+    obj = PredictPreprocessing()
     data = obj.transformations()
     return data
+
+    
