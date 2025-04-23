@@ -26,8 +26,7 @@ class MultiHourForcast:
     
     def forcasting(self):
         try:
-            columns_ = args["weather_parameters"] +[args["rain_parameters"][1]]
-            predicted_df = pd.DataFrame(columns=columns_) 
+
             for i in tqdm(range(self.args["forcasting_hours"])):
 
                 logging.info("Forcasting for the next hour")
@@ -41,15 +40,14 @@ class MultiHourForcast:
                 forcasting_df = pd.read_csv(args["forcasting_data_path"])
 
                 columns = forcasting_df.columns.tolist()
-                forcasting_df[columns[0]] = pd.to_datetime(forcasting_df[columns[0]], format="%Y-%m-%d %H:%M:%S")
+                forcasting_df[columns[0]] = pd.to_datetime(forcasting_df[columns[0]], dayfirst=True)
                 
                 recent_time = forcasting_df[columns[0]].max()
-                recent_time = pd.to_datetime(recent_time, format="%Y-%m-%d %H:%M:%S")
+                recent_time = pd.to_datetime(recent_time, dayfirst=True)
 
                 recent_time = recent_time + timedelta(hours=1)
                 forcasting_df.loc[len(forcasting_df)] = [recent_time, wind, temp, humidity, rain]
 
-                predicted_df.loc[len(predicted_df)] = [recent_time, wind, temp, humidity, rain]
 
                 logging.info("Added the predicted values to the dataframe")
 
@@ -57,7 +55,6 @@ class MultiHourForcast:
                 forcasting_df.to_csv(args["forcasting_data_path"], index=False)
                 logging.info(f"Saved the file with the predicted values of the hour {i+1}")
             
-            predicted_df.to_csv(args["forcasted_data_path"], index=False)
             logging.info("Forcasting completed!!!!!!!!!!!!!!!!!")
                 
         except Exception as e:
@@ -65,24 +62,24 @@ class MultiHourForcast:
         
     def plot_forcasted_data(self):
         try:
-            df = pd.read_csv(args["forcasted_data_path"])
-            df["ob_time"] = pd.to_datetime(df["ob_time"], format="%Y-%m-%d %H:%M:%S")
+            df = pd.read_csv(args["forcasting_data_path"])
+            df_forcasted = df.tail(24)
+            df_forcasted.iloc[:,0] = pd.to_datetime(df_forcasted.iloc[:,0], format="%Y-%m-%d %H:%M:%S")
 
             for col in df.columns:
                 
                 if col == "ob_time":
                     continue
-                plt.figure(figsize=(10, 5))
-                plt.plot(df["ob_time"], df[col], label=col)
+                plt.figure(figsize=(16, 10))
+                plt.plot(df_forcasted["ob_time"], df_forcasted[col])
                 plt.xlabel("Time")
                 plt.ylabel(col)
                 plt.title(f"{col} forcasting")
-                plt.legend()
                 plt.grid()
                 plt.show()
 
 
-            
+            logging.info("Plotting completed!!!!!!!!!!!!!!!!!")
 
         except Exception as e:
             raise CustomException(e, sys)

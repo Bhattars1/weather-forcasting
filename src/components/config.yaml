@@ -41,7 +41,6 @@ processed_weather_data_filename : "processed_weather_data.csv"
 
 forcasting_data_path : "data/forcasting_data/sample_data.csv"
 
-forcasted_data_path : "./data/forcasting_data/forcasted_data.csv"
 
 weather_data_skiprows : 280
 rain_data_skiprows: 61
