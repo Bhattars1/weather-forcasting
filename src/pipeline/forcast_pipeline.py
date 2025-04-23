@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
-
+from src.pipeline.data_ingestion_pipeline import GetWeather
 from src.logger import logging
 from src.exception_handler import CustomException
 from src.pipeline.predict_pipeline import prediction_pipeline
@@ -19,6 +19,8 @@ from src.pipeline.predict_pipeline import prediction_pipeline
 with open("./src/components/config.yaml", "r") as file:
     args = yaml.safe_load(file)
 
+get_weather = GetWeather()
+
 class MultiHourForcast:
     def __init__(self,
                  args=args):
@@ -26,6 +28,9 @@ class MultiHourForcast:
     
     def forcasting(self):
         try:
+            logging.info("Forcasting process initiated")
+            # Get the weather data
+            get_weather.get_weather()
 
             for i in tqdm(range(self.args["forcasting_hours"])):
 
@@ -40,7 +45,7 @@ class MultiHourForcast:
                 forcasting_df = pd.read_csv(args["forcasting_data_path"])
 
                 columns = forcasting_df.columns.tolist()
-                forcasting_df[columns[0]] = pd.to_datetime(forcasting_df[columns[0]], dayfirst=True)
+                forcasting_df[columns[0]] = pd.to_datetime(forcasting_df[columns[0]], format = "%Y-%m-%d %H:%M:%S")
                 
                 recent_time = forcasting_df[columns[0]].max()
                 recent_time = pd.to_datetime(recent_time, dayfirst=True)
@@ -85,9 +90,9 @@ class MultiHourForcast:
             raise CustomException(e, sys)
 
 
-        
-forcasting = MultiHourForcast(args)
-forcasting.forcasting()
-forcasting.plot_forcasted_data()
-    
+
+if __name__ == "__main__":
+    forcast = MultiHourForcast()
+    forcast.forcasting()
+    forcast.plot_forcasted_data()
             

@@ -39,7 +39,6 @@ processed_data_save_path : "./data/processed_data"
 processed_rain_data_filename : "processed_rain_data.csv"
 processed_weather_data_filename : "processed_weather_data.csv"
 
-forcasting_data_path : "data/forcasting_data/sample_data.csv"
 
 
 weather_data_skiprows : 280
@@ -68,4 +67,10 @@ preprocessed_label_path : "./data/preprocessed_data/label.pkl"
 scalar_path : "./scaler/scaler.pkl"
 
 test_size : 0.20
+
+
+# Forcasting Parameters
+forcasting_data_path : "data/forcasting_data/weekly_data.csv"
+ingestion_url : "https://archive-api.open-meteo.com/v1/archive"
+
 

@@ -38,8 +38,17 @@ class PredictPreprocessing:
         try:
             logging.info("Transformations of day and month initiated")
             self.data = pd.read_csv(self.data_path)
+
+            
+            # Rows Consistency
+            expected_rows = 7*24
+            if len(self.data) > expected_rows:
+                logging.info(f"Input limit exceeded!!! Truncating data from {len(self.data)} to last {expected_rows} rows.")
+                self.data = self.data.tail(expected_rows).reset_index(drop=True)
+
+        
             datetime_col = self.data.columns[0]
-            self.data[datetime_col] = pd.to_datetime(self.data[datetime_col], errors='coerce', dayfirst=True)
+            self.data[datetime_col] = pd.to_datetime(self.data[datetime_col], format="%Y-%m-%d %H:%M:%S")
 
             # Extract hour and month
             self.data["hour"] = self.data.iloc[:, 0].dt.hour
@@ -256,6 +265,7 @@ class PredictPreprocessing:
 def prediction_preprocessing_pipeline():
 
     obj = PredictPreprocessing()
+    # obj.prediction_data_consistency()
     data = obj.transformations()
     return data
 

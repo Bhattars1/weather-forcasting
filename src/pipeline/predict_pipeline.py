@@ -1,20 +1,16 @@
-import os
 import yaml
 import sys
 
 import torch
-import pandas as pd
-import numpy as np
+
 import joblib
 import xgboost as xgb
 
 
 
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 from src.components.algorithms import WindSpeedPredictionLSTM, HumidityMLP
-from src.logger import logging
 from src.exception_handler import CustomException
 from src.pipeline.prediction_preprocessing import prediction_preprocessing_pipeline
 
