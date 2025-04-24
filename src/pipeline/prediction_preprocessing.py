@@ -61,7 +61,6 @@ class PredictPreprocessing:
             # Fourier Transform Encoding for Month (12-month cycle)
             self.data["sine_month"] = np.sin(2 * np.pi * self.data["month"] / 12)
 
-            self.data.to_csv("seed.csv", index=False)
             
             logging.info("Successfully transformed hour and month for prediction")
 
@@ -71,7 +70,6 @@ class PredictPreprocessing:
 
             logging.info("Scaling the data")
             self.data = self.data.to_numpy()
-            # np.savetxt("seed.csv", self.data, delimiter=",")
 
             self.data = self.scaler.transform(self.data)
 

@@ -19,7 +19,8 @@ from src.pipeline.predict_pipeline import prediction_pipeline
 with open("./src/components/config.yaml", "r") as file:
     args = yaml.safe_load(file)
 
-get_weather = GetWeather()
+get_weather = GetWeather(save_path= args["ingested_save_path"])
+get_test_weather = GetWeather(save_path= args["ingested_test_save_path"], start_day=2, end_day=2)
 
 class MultiHourForcast:
     def __init__(self,
@@ -31,6 +32,7 @@ class MultiHourForcast:
             logging.info("Forcasting process initiated")
             # Get the weather data
             get_weather.get_weather()
+            get_test_weather.get_weather()
 
             for i in tqdm(range(self.args["forcasting_hours"])):
 
@@ -65,26 +67,51 @@ class MultiHourForcast:
         except Exception as e:
             raise CustomException(e, sys)
         
-    def plot_forcasted_data(self):
+    def plot_forecasted_vs_actual(self):
         try:
-            df = pd.read_csv(args["forcasting_data_path"])
-            df_forcasted = df.tail(24)
-            df_forcasted.iloc[:,0] = pd.to_datetime(df_forcasted.iloc[:,0], format="%Y-%m-%d %H:%M:%S")
+            import matplotlib.pyplot as plt
+            import pandas as pd
 
-            for col in df.columns:
-                
-                if col == "ob_time":
-                    continue
-                plt.figure(figsize=(16, 10))
-                plt.plot(df_forcasted["ob_time"], df_forcasted[col])
-                plt.xlabel("Time")
-                plt.ylabel(col)
-                plt.title(f"{col} forcasting")
-                plt.grid()
-                plt.show()
+            df = pd.read_csv(self.args["forcasting_data_path"])
+            test_df = pd.read_csv("data/forcasting_data/test_data.csv")
+
+            df = df.tail(24)  # last 24 hours of prediction
+            df["ob_time"] = pd.to_datetime(df["ob_time"], format="%Y-%m-%d %H:%M:%S")
+            test_df["ob_time"] = pd.to_datetime(test_df["ob_time"], format="%Y-%m-%d %H:%M:%S")
+
+            # Merge on ob_time
+            merged_df = pd.merge(df, test_df, on="ob_time", suffixes=("_pred", "_actual"))
 
 
-            logging.info("Plotting completed!!!!!!!!!!!!!!!!!")
+            variables = [col for col in df.columns if col != "ob_time"]
+
+            fig, axes = plt.subplots(nrows=len(variables), ncols=1, figsize=(16, 4 * len(variables)), sharex=True)
+
+            if len(variables) == 1:
+                axes = [axes]
+
+            for ax, var in zip(axes, variables):
+                ax.plot(merged_df["ob_time"], merged_df[f"{var}_actual"], label="Actual", color="blue")
+                ax.plot(merged_df["ob_time"], merged_df[f"{var}_pred"], label="Predicted", linestyle='--', color="orange")
+                ax.set_ylabel(var)
+                ax.set_title(f"{var} - Actual vs Predicted")
+                ax.grid(True)
+                ax.legend()
+
+            axes[-1].set_xlabel("Time")
+
+            plt.tight_layout()
+            plt.show()
+
+            save_option = input("Do you want to save the plot? (y/n): ").strip().lower()
+            if save_option == "y":
+                file_name = self.args["forcasted_plot_path"]
+                fig.savefig(f"{file_name}.png")
+                logging.info(f"Plot saved as {file_name}.png")
+            else:
+                logging.info("Plot not saved.")
+
+            logging.info("Plotting completed.")
 
         except Exception as e:
             raise CustomException(e, sys)
@@ -94,5 +121,5 @@ class MultiHourForcast:
 if __name__ == "__main__":
     forcast = MultiHourForcast()
     forcast.forcasting()
-    forcast.plot_forcasted_data()
+    forcast.plot_forecasted_vs_actual()
             

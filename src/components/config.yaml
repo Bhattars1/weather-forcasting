@@ -73,4 +73,7 @@ test_size : 0.20
 forcasting_data_path : "data/forcasting_data/weekly_data.csv"
 ingestion_url : "https://archive-api.open-meteo.com/v1/archive"
 
+forcasted_plot_path : "./data/images/forcasted_plot.png"
 
+ingested_save_path : "data/forcasting_data/weekly_data.csv"
+ingested_test_save_path: "data/forcasting_data/test_data.csv"

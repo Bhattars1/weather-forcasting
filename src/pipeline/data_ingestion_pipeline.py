@@ -18,44 +18,56 @@ with open("./src/components/config.yaml", "r") as file:
     args = yaml.safe_load(file)
 
 
-
-wind_speed = args["weather_parameters"][1]
-temperature = args["weather_parameters"][2]
-relative_humidity = args["weather_parameters"][3]
-precipitation = args["rain_parameters"][1]
-
-columns = [wind_speed, temperature, relative_humidity, precipitation]
-
-def get_forecast_date_range():
-    today = datetime.now(UTC).date()   
-    start_date = today - timedelta(days=9)     
-    end_date = today - timedelta(days=2)  
-    return start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d')
-
-start_date, end_date = get_forecast_date_range()
+def extract_columns(args=args):
     
-ingestion_params = {
-    "latitude": 51.4787,
-    "longitude": -0.2956,
-    "start_date": start_date,
-    "end_date": end_date,
-    "hourly": ["temperature_2m", "relative_humidity_2m", "precipitation", "wind_speed_10m"]
-}
+    wind_speed = args["weather_parameters"][1]
+    temperature = args["weather_parameters"][2]
+    relative_humidity = args["weather_parameters"][3]
+    precipitation = args["rain_parameters"][1]
+
+    columns = [wind_speed, temperature, relative_humidity, precipitation]
+    return columns
+columns = extract_columns(args=args)
+
+def get_params(start_day=11, end_day=4):
+    today = datetime.now(UTC).date()   
+    start_date = today - timedelta(days=start_day)     
+    end_date = today - timedelta(days=end_day)  
+    start_date, end_date = start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d')
+
+    
+    ingestion_params = {
+        "latitude": 51.4787,
+        "longitude": -0.2956,
+        "start_date": start_date,
+        "end_date": end_date,
+        "hourly": ["temperature_2m", "relative_humidity_2m", "precipitation", "wind_speed_10m"]
+    }
+    return ingestion_params
+
 
 class GetWeather:
-    def __init__(self, ingestion_params=ingestion_params, columns=columns):
-        self.ingestion_params = ingestion_params
+    def __init__(self, save_path,
+                 columns=columns,
+                 start_day=10,
+                 end_day=3,
+                 ):
         self.columns = columns
+        self.start_day = start_day
+        self.end_day = end_day
+        self.save_path = save_path
 
     def get_weather(self):
         try:
             logging.info("Weather data retriving process initiated")
+
+            params = get_params(start_day=self.start_day, end_day=self.end_day)
             # Setup the Open-Meteo API client with cache and retry on error
             cache_session = requests_cache.CachedSession('.cache', expire_after = -1)
             retry_session = retry(cache_session, retries = 5, backoff_factor = 0.2)
             openmeteo = openmeteo_requests.Client(session = retry_session)
 
-            responses = openmeteo.weather_api(url="https://archive-api.open-meteo.com/v1/archive", params=self.ingestion_params)
+            responses = openmeteo.weather_api(url="https://archive-api.open-meteo.com/v1/archive", params=params)
 
             # Process first location. Add a for-loop for multiple locations or weather models
             response = responses[0]
@@ -89,9 +101,8 @@ class GetWeather:
                                             "relative_humidity_2m": self.columns[2],
                                             "precipitation": self.columns[3],
                                             }, inplace=True)
-            save_path = "data/forcasting_data/weekly_data.csv"
-            hourly_dataframe.to_csv(save_path, index = False)
+            hourly_dataframe.to_csv(self.save_path, index = False)
 
-            logging.info(f"Weather data saved successfully to {save_path}")
+            logging.info(f"Weather data saved successfully to {self.save_path}")
         except Exception as e:
             raise CustomException(e, sys)
